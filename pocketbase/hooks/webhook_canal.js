@@ -14,14 +14,12 @@ routerAdd('POST', '/backend/v1/webhook/canal', (e) => {
   const mensagem = String(body.mensagem || body.message || body.text || '').trim()
   if (!telefone) return e.badRequestError('telefone/remetente é obrigatório')
 
-  // Localiza lead existente por telefone (dedup por canal)
   let lead = null
   try {
     const found = $app.findRecordsByFilter('leads', 'telefone = {:t}', '-created', 1, 0, telefone)
     if (found.length > 0) lead = found[0]
   } catch (err) {}
 
-  // Cria se não existir
   if (!lead) {
     try {
       const col = $app.findCollectionByNameOrId('leads')
@@ -39,7 +37,6 @@ routerAdd('POST', '/backend/v1/webhook/canal', (e) => {
     }
   }
 
-  // Registra interação de entrada
   try {
     const colInter = $app.findCollectionByNameOrId('interacoes')
     const inter = new Record(colInter)
@@ -53,7 +50,9 @@ routerAdd('POST', '/backend/v1/webhook/canal', (e) => {
     $app.logger().warn('webhook canal: falha ao registrar interacao', 'error', String(err))
   }
 
-  // Delega a conversa ao agente de qualificação (se houver mensagem)
+  // Delega a conversa ao agente de qualificação. No fluxo público (sem usuário logado),
+  // o user_id é o id do lead — o agente usa o tool actAs:admin (scopeFilter id={:lead_id})
+  // para atualizar apenas este lead.
   let resposta = 'Recebemos seu contato! Em instantes nosso time retorna. Obrigado!'
   if (mensagem) {
     try {
@@ -64,7 +63,13 @@ routerAdd('POST', '/backend/v1/webhook/canal', (e) => {
       })
       if (result && result.content) resposta = result.content
     } catch (err) {
-      $app.logger().warn('webhook canal: agente falhou', 'error', String(err))
+      $app
+        .logger()
+        .error(
+          'webhook canal: agente falhou',
+          'error',
+          String(err && err.message ? err.message : err),
+        )
     }
   }
 
