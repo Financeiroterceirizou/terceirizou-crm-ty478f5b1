@@ -33,6 +33,11 @@ const Clientes = () => {
   }, [])
 
   const leadPorId = (id: string) => leads.find((l) => l.id === id)
+  const clientesOrdenados = [...clientes].sort((a, b) => {
+    const nomeA = (leadPorId(a.lead)?.nome || '').toLowerCase()
+    const nomeB = (leadPorId(b.lead)?.nome || '').toLowerCase()
+    return nomeA.localeCompare(nomeB, 'pt-BR')
+  })
 
   const mrr = clientes
     .filter((c) => c.status_contrato !== 'cancelado')
@@ -94,7 +99,7 @@ const Clientes = () => {
                 </tr>
               </thead>
               <tbody>
-                {clientes.map((c) => {
+                {clientesOrdenados.map((c) => {
                   const lead = leadPorId(c.lead)
                   return (
                     <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50">

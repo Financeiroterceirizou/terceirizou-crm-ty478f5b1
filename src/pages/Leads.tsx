@@ -182,11 +182,13 @@ const Leads = () => {
     setSalvando(false)
   }
 
-  const filtrados = leads.filter((l) => {
-    const porCanal = filtroCanal ? l.canal_origem === filtroCanal : true
-    const porTipo = filtroTipo ? l.tipo_servico === filtroTipo : true
-    return porCanal && porTipo
-  })
+  const filtrados = leads
+    .filter((l) => {
+      const porCanal = filtroCanal ? l.canal_origem === filtroCanal : true
+      const porTipo = filtroTipo ? l.tipo_servico === filtroTipo : true
+      return porCanal && porTipo
+    })
+    .sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'))
   const tipoPorId = (id: string) => tipos.find((t) => t.id === id)
 
   return (
