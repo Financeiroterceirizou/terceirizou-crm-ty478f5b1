@@ -30,9 +30,12 @@ onRecordCreate((e) => {
   if (tipo && tipo !== 'prestador_servico') score = -100
 
   r.set('score', score)
-  if (score >= 60) r.set('prioridade', 'alta')
-  else if (score >= 35) r.set('prioridade', 'media')
-  else r.set('prioridade', 'baixa')
+
+  // Leads novos começam sem prioridade (prioridade é definida quando entram no funil ativo)
+  const etapa = r.getString('etapa')
+  if (!etapa || etapa === 'novo') {
+    r.set('prioridade', 'sem_prioridade')
+  }
 
   // Padrão de etapa inicial
   if (!r.getString('etapa')) r.set('etapa', 'novo')
