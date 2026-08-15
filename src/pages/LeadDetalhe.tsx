@@ -299,10 +299,7 @@ const LeadDetalhe = () => {
                 ))}
               </select>
             </div>
-            <div className="bg-slate-50 rounded-lg p-3">
-              <p className="text-xs text-slate-500">Urgência</p>
-              <p className="font-medium text-slate-800 capitalize">{lead.urgencia || '—'}</p>
-            </div>
+
             <div className="bg-slate-50 rounded-lg p-3">
               <p className="text-xs text-slate-500">Valor do plano (R$/mês)</p>
               <p className="font-medium text-slate-800">

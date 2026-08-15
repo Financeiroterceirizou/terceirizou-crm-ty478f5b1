@@ -72,7 +72,6 @@ const FORM_INICIAL = {
   canal_origem: 'whatsapp',
   tipo_negocio: 'prestador_servico',
   tipo_servico: '',
-  urgencia: 'media',
   sistema_atual: '',
   indicado_por: '',
   observacao: '',
@@ -154,7 +153,6 @@ const Leads = () => {
         telefone: form.telefone.trim(),
         canal_origem: form.canal_origem,
         tipo_negocio: form.tipo_negocio,
-        urgencia: form.urgencia,
         dores: form.dores,
       }
       if (form.tipo_servico) payload.tipo_servico = form.tipo_servico
@@ -457,18 +455,6 @@ const Leads = () => {
                       </button>
                     </form>
                   )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Urgência</label>
-                  <select
-                    value={form.urgencia}
-                    onChange={(ev) => setForm({ ...form, urgencia: ev.target.value })}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                  >
-                    <option value="baixa">Baixa</option>
-                    <option value="media">Média</option>
-                    <option value="alta">Alta</option>
-                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Cidade</label>

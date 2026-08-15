@@ -21,9 +21,8 @@ onRecordCreate((e) => {
   if (tipo === 'prestador_servico') score += 40
   if (r.getString('tipo_servico')) score += 15
   if (r.getBool('receita_recente')) score += 15
-  const urg = r.getString('urgencia')
   const vol = r.getInt('volume_transacoes')
-  if (urg === 'alta' || vol >= 300) score += 15
+  if (vol >= 300) score += 15
   const dec = (r.getString('decisor') || '').toLowerCase()
   if (dec.indexOf('don') === 0 || dec.indexOf('só') === 0 || dec.indexOf('soci') === 0) score += 10
   const canal = r.getString('canal_origem')
