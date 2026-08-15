@@ -184,11 +184,12 @@ const Leads = () => {
     setSalvando(false)
   }
 
+  const totalLeads = leads.filter((l) => l.etapa !== 'cliente').length
   const filtrados = leads
     .filter((l) => {
       const porCanal = filtroCanal ? l.canal_origem === filtroCanal : true
       const porTipo = filtroTipo ? l.tipo_servico === filtroTipo : true
-      return porCanal && porTipo
+      return porCanal && porTipo && l.etapa !== 'cliente'
     })
     .sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'))
   const tipoPorId = (id: string) => tipos.find((t) => t.id === id)
@@ -236,7 +237,12 @@ const Leads = () => {
                 </option>
               ))}
             </select>
-            <span className="text-sm text-slate-600">{filtrados.length} leads</span>
+            <span className="text-sm font-semibold text-slate-800 bg-slate-100 rounded-lg px-3 py-1.5">
+              Total de leads: {totalLeads}
+            </span>
+            {filtroCanal || filtroTipo ? (
+              <span className="text-sm text-slate-600">{filtrados.length} filtrados</span>
+            ) : null}
             <button
               onClick={() => {
                 setErro('')
