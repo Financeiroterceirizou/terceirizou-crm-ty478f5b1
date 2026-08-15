@@ -27,7 +27,7 @@ onRecordCreate((e) => {
   const dec = (r.getString('decisor') || '').toLowerCase()
   if (dec.indexOf('don') === 0 || dec.indexOf('só') === 0 || dec.indexOf('soci') === 0) score += 10
   const canal = r.getString('canal_origem')
-  if (canal === 'indicacao') score += 5
+  if (canal === 'indicacao' || canal === 'banco_cora') score += 5
   if (tipo && tipo !== 'prestador_servico') score = -100
 
   r.set('score', score)

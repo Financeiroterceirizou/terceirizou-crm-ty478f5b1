@@ -38,6 +38,7 @@ const CANAL_LABEL: Record<string, string> = {
   whatsapp: 'WhatsApp',
   telegram: 'Telegram',
   indicacao: 'Indicação',
+  banco_cora: 'Banco Cora',
 }
 
 const DOR_LABEL: Record<string, string> = {
