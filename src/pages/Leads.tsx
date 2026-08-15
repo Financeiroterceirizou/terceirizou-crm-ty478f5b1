@@ -195,8 +195,8 @@ const Leads = () => {
   const tipoPorId = (id: string) => tipos.find((t) => t.id === id)
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
+      <header className="bg-white border-b border-slate-200 shrink-0 z-30">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link to="/" className="text-lg font-bold text-slate-800">
@@ -256,23 +256,23 @@ const Leads = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        {erro && <p className="text-sm text-red-600 mb-4">{erro}</p>}
-        <div className="flex gap-4 overflow-x-auto pb-4">
+      <main className="max-w-7xl w-full mx-auto px-4 py-6 flex-1 min-h-0 flex flex-col">
+        {erro && <p className="text-sm text-red-600 mb-4 shrink-0">{erro}</p>}
+        <div className="flex gap-4 overflow-x-auto overflow-y-auto pb-4 flex-1 min-h-0 content-start">
           {ETAPAS.map((etapa) => {
             const itens = filtrados.filter((l) => l.etapa === etapa)
             return (
               <div
                 key={etapa}
-                className={`min-w-[240px] flex-1 rounded-xl border border-slate-200 p-3 ${ETAPA_COR[etapa]}`}
+                className={`min-w-[240px] max-h-full flex-1 rounded-xl border border-slate-200 flex flex-col ${ETAPA_COR[etapa]}`}
               >
-                <h3 className="font-semibold text-sm text-slate-700 mb-3 flex items-center justify-between">
+                <h3 className="sticky top-0 z-10 font-semibold text-sm text-slate-700 mb-3 flex items-center justify-between px-3 pt-3 pb-2 border-b border-slate-200/70 bg-inherit">
                   <span>{ETAPA_LABEL[etapa]}</span>
                   <span className="text-xs bg-white rounded-full px-2 py-0.5 border border-slate-200">
                     {itens.length}
                   </span>
                 </h3>
-                <div className="space-y-2">
+                <div className="px-3 pb-3 space-y-2 overflow-y-auto">
                   {itens.map((l) => (
                     <div
                       key={l.id}
