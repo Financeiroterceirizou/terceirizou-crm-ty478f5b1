@@ -89,6 +89,8 @@ const Leads = () => {
   const [novoTipo, setNovoTipo] = useState('')
   const [salvandoTipo, setSalvandoTipo] = useState(false)
 
+  const ordenaTipos = (arr: any[]) => [...arr].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+
   const carregar = async () => {
     try {
       const [lista, tiposLista] = await Promise.all([
@@ -96,7 +98,7 @@ const Leads = () => {
         pb.collection('tipos_servico').getList(1, 100, { sort: 'nome' }),
       ])
       setLeads(lista.items)
-      setTipos(tiposLista.items)
+      setTipos(ordenaTipos(tiposLista.items))
     } catch (e: any) {
       setErro(e.message || 'Erro ao carregar dados')
     }
@@ -130,7 +132,7 @@ const Leads = () => {
     setErro('')
     try {
       const criado = await pb.collection('tipos_servico').create({ nome, ativo: true })
-      setTipos((prev) => [...prev, criado].sort((a, b) => a.nome.localeCompare(b.nome)))
+      setTipos((prev) => ordenaTipos([...prev, criado]))
       setForm((prev) => ({ ...prev, tipo_servico: criado.id }))
       setNovoTipo('')
     } catch (e: any) {
@@ -408,7 +410,7 @@ const Leads = () => {
                     </select>
                     <button
                       type="button"
-                      onClick={() => setNovoTipo('')}
+                      onClick={() => setNovoTipo(novoTipo === '' ? ' ' : '')}
                       className="rounded-lg border border-emerald-300 text-emerald-700 px-3 py-2 text-sm whitespace-nowrap hover:bg-emerald-50"
                       title="Incluir novo tipo de serviço"
                     >
@@ -422,7 +424,7 @@ const Leads = () => {
                       onClick={(ev) => ev.stopPropagation()}
                     >
                       <input
-                        value={novoTipo}
+                        value={novoTipo === ' ' ? '' : novoTipo}
                         onChange={(ev) => setNovoTipo(ev.target.value)}
                         className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
                         placeholder="Nome do novo tipo de serviço"
