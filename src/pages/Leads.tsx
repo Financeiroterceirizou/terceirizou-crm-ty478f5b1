@@ -12,7 +12,6 @@ const ETAPAS = [
   'reuniao_realizada',
   'proposta_enviada',
   'negociacao',
-  'cliente',
   'perdido',
   'descartado',
 ]
@@ -25,7 +24,6 @@ const ETAPA_LABEL: Record<string, string> = {
   reuniao_realizada: 'Reunião realizada',
   proposta_enviada: 'Proposta enviada',
   negociacao: 'Negociação',
-  cliente: 'Cliente',
   perdido: 'Perdido',
   descartado: 'Descartado',
 }
@@ -57,7 +55,6 @@ const ETAPA_COR: Record<string, string> = {
   reuniao_realizada: 'bg-violet-50',
   proposta_enviada: 'bg-amber-50',
   negociacao: 'bg-orange-50',
-  cliente: 'bg-emerald-50',
   perdido: 'bg-red-50',
   descartado: 'bg-slate-50',
 }

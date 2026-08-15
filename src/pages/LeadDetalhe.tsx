@@ -11,7 +11,6 @@ const ETAPA_LABEL: Record<string, string> = {
   reuniao_realizada: 'Reunião realizada',
   proposta_enviada: 'Proposta enviada',
   negociacao: 'Negociação',
-  cliente: 'Cliente',
   perdido: 'Perdido',
   descartado: 'Descartado',
 }
