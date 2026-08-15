@@ -1,4 +1,4 @@
-/* Página de Leads: kanban por etapa, filtro por canal e criação manual de lead.
+/* Página de Leads: kanban por etapa, filtro por canal e tipo de serviço, e criação manual de lead.
    Tipo de serviço é dinâmico (coleção tipos_servico) com botão para incluir novos. */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -82,6 +82,7 @@ const Leads = () => {
   const [leads, setLeads] = useState<any[]>([])
   const [tipos, setTipos] = useState<any[]>([])
   const [filtroCanal, setFiltroCanal] = useState('')
+  const [filtroTipo, setFiltroTipo] = useState('')
   const [erro, setErro] = useState('')
   const [mostrarForm, setMostrarForm] = useState(false)
   const [form, setForm] = useState({ ...FORM_INICIAL })
@@ -185,7 +186,11 @@ const Leads = () => {
     setSalvando(false)
   }
 
-  const filtrados = filtroCanal ? leads.filter((l) => l.canal_origem === filtroCanal) : leads
+  const filtrados = leads.filter((l) => {
+    const porCanal = filtroCanal ? l.canal_origem === filtroCanal : true
+    const porTipo = filtroTipo ? l.tipo_servico === filtroTipo : true
+    return porCanal && porTipo
+  })
   const tipoPorId = (id: string) => tipos.find((t) => t.id === id)
 
   return (
@@ -216,6 +221,18 @@ const Leads = () => {
               {Object.entries(CANAL_LABEL).map(([k, v]) => (
                 <option key={k} value={k}>
                   {v}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filtroTipo}
+              onChange={(ev) => setFiltroTipo(ev.target.value)}
+              className="text-sm rounded-lg border border-slate-300 px-2 py-1"
+            >
+              <option value="">Todos os tipos</option>
+              {tipos.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.nome}
                 </option>
               ))}
             </select>
