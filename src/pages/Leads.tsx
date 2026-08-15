@@ -1,4 +1,4 @@
-/* Página de Leads: kanban por etapa com movimentação e filtro por canal. */
+/* Página de Leads: kanban por etapa, filtro por canal e criação manual de lead. */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import pb from '@/lib/pocketbase/client'
@@ -39,6 +39,26 @@ const CANAL_LABEL: Record<string, string> = {
   indicacao: 'Indicação',
 }
 
+const NICHO_LABEL: Record<string, string> = {
+  ilpi: 'Casa de Repouso (ILPI)',
+  protecao_veicular: 'Proteção Veicular',
+  vistoria_veicular: 'Vistoria Veicular',
+  arquitetura: 'Arquitetura',
+  marketing: 'Marketing',
+  consultoria_ambiental: 'Consultoria Ambiental',
+  consultoria_negocio: 'Consultoria de Negócio',
+  clinica_estetica: 'Clínica de Estética',
+  outro: 'Outro',
+}
+
+const DOR_LABEL: Record<string, string> = {
+  falta_tempo: 'Falta de tempo',
+  falta_transparencia: 'Falta de transparência',
+  dificuldade_decisao: 'Dificuldade de decisão',
+  contas_misturadas: 'Contas misturadas',
+  custos_fora_controle: 'Custos fora de controle',
+}
+
 const ETAPA_COR: Record<string, string> = {
   novo: 'bg-slate-100',
   qualificado: 'bg-blue-50',
@@ -52,20 +72,41 @@ const ETAPA_COR: Record<string, string> = {
   descartado: 'bg-slate-50',
 }
 
+const FORM_INICIAL = {
+  nome: '',
+  empresa: '',
+  telefone: '',
+  email: '',
+  cidade: '',
+  uf: '',
+  canal_origem: 'whatsapp',
+  tipo_negocio: 'prestador_servico',
+  nicho: 'outro',
+  urgencia: 'media',
+  sistema_atual: '',
+  indicado_por: '',
+  observacao: '',
+  dores: [] as string[],
+}
+
 const Leads = () => {
   const [leads, setLeads] = useState<any[]>([])
   const [filtroCanal, setFiltroCanal] = useState('')
   const [erro, setErro] = useState('')
+  const [mostrarForm, setMostrarForm] = useState(false)
+  const [form, setForm] = useState({ ...FORM_INICIAL })
+  const [salvando, setSalvando] = useState(false)
+
+  const carregar = async () => {
+    try {
+      const lista = await pb.collection('leads').getList(1, 300, { sort: '-created' })
+      setLeads(lista.items)
+    } catch (e: any) {
+      setErro(e.message || 'Erro ao carregar leads')
+    }
+  }
 
   useEffect(() => {
-    const carregar = async () => {
-      try {
-        const lista = await pb.collection('leads').getList(1, 300, { sort: '-created' })
-        setLeads(lista.items)
-      } catch (e: any) {
-        setErro(e.message || 'Erro ao carregar leads')
-      }
-    }
     if (pb.authStore.isValid) carregar()
   }, [])
 
@@ -76,6 +117,58 @@ const Leads = () => {
     } catch (e: any) {
       setErro(e.message || 'Erro ao mover lead')
     }
+  }
+
+  const toggleDor = (dor: string) => {
+    setForm((prev) => ({
+      ...prev,
+      dores: prev.dores.includes(dor) ? prev.dores.filter((d) => d !== dor) : [...prev.dores, dor],
+    }))
+  }
+
+  const criarLead = async (ev: React.FormEvent) => {
+    ev.preventDefault()
+    setSalvando(true)
+    setErro('')
+    try {
+      const payload: any = {
+        nome: form.nome.trim(),
+        empresa: form.empresa.trim(),
+        telefone: form.telefone.trim(),
+        canal_origem: form.canal_origem,
+        tipo_negocio: form.tipo_negocio,
+        nicho: form.nicho,
+        urgencia: form.urgencia,
+        dores: form.dores,
+      }
+      if (form.email.trim()) payload.email = form.email.trim()
+      if (form.cidade.trim()) payload.cidade = form.cidade.trim()
+      if (form.uf.trim()) payload.uf = form.uf.trim().toUpperCase()
+      if (form.sistema_atual.trim()) payload.sistema_atual = form.sistema_atual.trim()
+      if (form.canal_origem === 'indicacao' && form.indicado_por.trim()) {
+        payload.indicado_por = form.indicado_por.trim()
+      }
+
+      const novo = await pb.collection('leads').create(payload)
+
+      // Observação vira a primeira interação do lead
+      if (form.observacao.trim()) {
+        await pb.collection('interacoes').create({
+          lead: novo.id,
+          canal: form.canal_origem,
+          tipo: 'entrada',
+          data_hora: new Date().toISOString(),
+          resumo: form.observacao.trim(),
+        })
+      }
+
+      setForm({ ...FORM_INICIAL })
+      setMostrarForm(false)
+      await carregar()
+    } catch (e: any) {
+      setErro(e.message || 'Erro ao criar lead')
+    }
+    setSalvando(false)
   }
 
   const filtrados = filtroCanal ? leads.filter((l) => l.canal_origem === filtroCanal) : leads
@@ -112,6 +205,15 @@ const Leads = () => {
               ))}
             </select>
             <span className="text-sm text-slate-600">{filtrados.length} leads</span>
+            <button
+              onClick={() => {
+                setErro('')
+                setMostrarForm(true)
+              }}
+              className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-1.5 text-sm"
+            >
+              + Novo Lead
+            </button>
           </div>
         </div>
       </header>
@@ -176,6 +278,229 @@ const Leads = () => {
           })}
         </div>
       </main>
+
+      {mostrarForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <h2 className="text-lg font-bold text-slate-800">Novo Lead</h2>
+              <button
+                onClick={() => setMostrarForm(false)}
+                className="text-slate-400 hover:text-slate-600 text-xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={criarLead} className="p-6 space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Nome completo <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    value={form.nome}
+                    onChange={(ev) => setForm({ ...form, nome: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Empresa <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    value={form.empresa}
+                    onChange={(ev) => setForm({ ...form, empresa: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Telefone / WhatsApp <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    value={form.telefone}
+                    onChange={(ev) => setForm({ ...form, telefone: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    placeholder="(48) 99999-9999"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(ev) => setForm({ ...form, email: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Canal de origem <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={form.canal_origem}
+                    onChange={(ev) => setForm({ ...form, canal_origem: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  >
+                    {Object.entries(CANAL_LABEL).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Tipo de negócio <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={form.tipo_negocio}
+                    onChange={(ev) => setForm({ ...form, tipo_negocio: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  >
+                    <option value="prestador_servico">Prestador de serviço</option>
+                    <option value="comercio">Comércio</option>
+                    <option value="industria">Indústria</option>
+                    <option value="outro">Outro</option>
+                  </select>
+                  {form.tipo_negocio !== 'prestador_servico' && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      Atenção: a Terceirizou não atende quem vende/fabrica produtos. O lead será
+                      descartado automaticamente.
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Nicho</label>
+                  <select
+                    value={form.nicho}
+                    onChange={(ev) => setForm({ ...form, nicho: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  >
+                    {Object.entries(NICHO_LABEL).map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Urgência</label>
+                  <select
+                    value={form.urgencia}
+                    onChange={(ev) => setForm({ ...form, urgencia: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  >
+                    <option value="baixa">Baixa</option>
+                    <option value="media">Média</option>
+                    <option value="alta">Alta</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Cidade</label>
+                  <input
+                    value={form.cidade}
+                    onChange={(ev) => setForm({ ...form, cidade: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">UF</label>
+                  <input
+                    value={form.uf}
+                    onChange={(ev) => setForm({ ...form, uf: ev.target.value })}
+                    maxLength={2}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    placeholder="SC"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Sistema financeiro atual
+                  </label>
+                  <input
+                    value={form.sistema_atual}
+                    onChange={(ev) => setForm({ ...form, sistema_atual: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    placeholder="Nenhum, Planilha, Software…"
+                  />
+                </div>
+              </div>
+
+              {form.canal_origem === 'indicacao' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Indicado por (nome/empresa)
+                  </label>
+                  <input
+                    value={form.indicado_por}
+                    onChange={(ev) => setForm({ ...form, indicado_por: ev.target.value })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    placeholder="Quem indicou o contato?"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Dores</label>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(DOR_LABEL).map(([k, v]) => (
+                    <label
+                      key={k}
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm cursor-pointer ${
+                        form.dores.includes(k)
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                          : 'border-slate-300 text-slate-600'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.dores.includes(k)}
+                        onChange={() => toggleDor(k)}
+                        className="hidden"
+                      />
+                      {v}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Observação (vira a primeira interação)
+                </label>
+                <textarea
+                  value={form.observacao}
+                  onChange={(ev) => setForm({ ...form, observacao: ev.target.value })}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  rows={3}
+                  placeholder="Contexto do contato, como chegou, o que precisa…"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setMostrarForm(false)}
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={salvando}
+                  className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 text-sm disabled:opacity-50"
+                >
+                  {salvando ? 'Salvando…' : 'Criar Lead'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
