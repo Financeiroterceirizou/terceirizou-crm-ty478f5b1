@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T20:37:07.725Z",
+  "generatedAt": "2026-08-15T20:43:52.627Z",
   "collections": [
     {
       "name": "users",
@@ -403,24 +403,6 @@
             "cliente",
             "perdido",
             "descartado"
-          ]
-        },
-        {
-          "name": "score",
-          "type": "number",
-          "required": false,
-          "system": false
-        },
-        {
-          "name": "prioridade",
-          "type": "select",
-          "required": false,
-          "system": false,
-          "selectValues": [
-            "sem_prioridade",
-            "baixa",
-            "media",
-            "alta"
           ]
         },
         {

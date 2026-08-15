@@ -179,12 +179,7 @@ const LeadDetalhe = () => {
               </p>
             </div>
             <div className="text-right">
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${(lead.score || 0) >= 60 ? 'bg-emerald-100 text-emerald-700' : (lead.score || 0) >= 35 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}
-              >
-                Score {lead.score ?? 0}
-              </span>
-              <p className="text-xs text-slate-500 mt-2">
+              <p className="text-xs text-slate-500">
                 {lead.telefone}
                 {lead.email ? ` · ${lead.email}` : ''}
               </p>

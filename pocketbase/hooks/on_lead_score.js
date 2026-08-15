@@ -1,5 +1,4 @@
-// Calcula o lead score automaticamente e aplica a trava de regra de negócio no CREATE.
-// Regras inegociáveis: só prestador de serviço; nunca cliente que vende/fabrica produto.
+// Trava de regra de negócio no CREATE: só prestador de serviço; nunca cliente que vende/fabrica produto.
 // Model hook: roda em qualquer $app.save() (API, agente, seed). Nunca chamar $app.save aqui.
 onRecordCreate((e) => {
   const r = e.record
@@ -14,27 +13,6 @@ onRecordCreate((e) => {
         'Tipo de negócio incompatível: empresa vende ou fabrica produtos. Regra inegociável da Terceirizou.',
       )
     }
-  }
-
-  // Lead score automático (0-100)
-  let score = 0
-  if (tipo === 'prestador_servico') score += 40
-  if (r.getString('tipo_servico')) score += 15
-  if (r.getBool('receita_recente')) score += 15
-  const vol = r.getInt('volume_transacoes')
-  if (vol >= 300) score += 15
-  const dec = (r.getString('decisor') || '').toLowerCase()
-  if (dec.indexOf('don') === 0 || dec.indexOf('só') === 0 || dec.indexOf('soci') === 0) score += 10
-  const canal = r.getString('canal_origem')
-  if (canal === 'indicacao' || canal === 'banco_cora') score += 5
-  if (tipo && tipo !== 'prestador_servico') score = -100
-
-  r.set('score', score)
-
-  // Leads novos começam sem prioridade (prioridade é definida quando entram no funil ativo)
-  const etapa = r.getString('etapa')
-  if (!etapa || etapa === 'novo') {
-    r.set('prioridade', 'sem_prioridade')
   }
 
   // Padrão de etapa inicial

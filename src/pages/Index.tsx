@@ -186,13 +186,7 @@ const Index = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {card('Clientes ativos', clientesAtivos, 'text-slate-800')}
               {card('Leads no mês', leadsNoMes, 'text-slate-800')}
-              {card(
-                'Score médio',
-                ativos.length
-                  ? Math.round(ativos.reduce((s, l) => s + (l.score || 0), 0) / ativos.length)
-                  : 0,
-                'text-slate-800',
-              )}
+
               {card(
                 'Ticket médio (R$)',
                 clientesAtivos ? Math.round(mrr / clientesAtivos) : 0,
@@ -253,7 +247,6 @@ const Index = () => {
                       <th className="py-2 pr-4">Empresa</th>
                       <th className="py-2 pr-4">Canal</th>
                       <th className="py-2 pr-4">Etapa</th>
-                      <th className="py-2 pr-4">Score</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -266,13 +259,6 @@ const Index = () => {
                         </td>
                         <td className="py-2 pr-4 text-slate-600">
                           {ETAPA_LABEL[l.etapa] || l.etapa}
-                        </td>
-                        <td className="py-2 pr-4">
-                          <span
-                            className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${(l.score || 0) >= 60 ? 'bg-emerald-100 text-emerald-700' : (l.score || 0) >= 35 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}
-                          >
-                            {l.score ?? 0}
-                          </span>
                         </td>
                       </tr>
                     ))}

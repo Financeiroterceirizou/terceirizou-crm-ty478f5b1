@@ -281,11 +281,6 @@ const Leads = () => {
                             ? ` · ${tipoPorId(l.tipo_servico).nome}`
                             : ''}
                         </span>
-                        <span
-                          className={`text-xs font-medium px-1.5 py-0.5 rounded ${(l.score || 0) >= 60 ? 'bg-emerald-100 text-emerald-700' : (l.score || 0) >= 35 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}
-                        >
-                          {l.score ?? 0}
-                        </span>
                       </div>
                       <div className="mt-2 flex gap-1">
                         <select
