@@ -122,6 +122,10 @@ const Index = () => {
   }
 
   const ativos = leads.filter((l) => !['cliente', 'perdido', 'descartado'].includes(l.etapa))
+  const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+  const leadsNoMes = leads.filter(
+    (l) => new Date(l.created) >= inicioMes && !['cliente', 'descartado'].includes(l.etapa),
+  ).length
   const emReuniao = leads.filter((l) => l.etapa === 'reuniao_agendada').length
   const emProposta = leads.filter((l) =>
     ['proposta_enviada', 'negociacao'].includes(l.etapa),
@@ -181,12 +185,7 @@ const Index = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {card('Clientes ativos', clientesAtivos, 'text-slate-800')}
-              {card(
-                'Leads por mês (30d)',
-                leads.filter((l) => new Date(l.created) > new Date(Date.now() - 30 * 86400000))
-                  .length,
-                'text-slate-800',
-              )}
+              {card('Leads no mês', leadsNoMes, 'text-slate-800')}
               {card(
                 'Score médio',
                 ativos.length
