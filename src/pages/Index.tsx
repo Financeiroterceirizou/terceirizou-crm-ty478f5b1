@@ -127,6 +127,7 @@ const Index = () => {
   const leadsNoMes = leads.filter(
     (l) => new Date(l.created) >= inicioMes && !['cliente', 'descartado'].includes(l.etapa),
   ).length
+  const leadsNovos = leads.filter((l) => l.etapa === 'novo').length
   const emReuniao = leads.filter((l) => l.etapa === 'reuniao_agendada').length
   const emProposta = leads.filter((l) =>
     ['proposta_enviada', 'negociacao'].includes(l.etapa),
@@ -187,6 +188,7 @@ const Index = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {card('Clientes ativos', clientesAtivos, 'text-slate-800')}
               {card('Leads no mês', leadsNoMes, 'text-slate-800')}
+              {card('Leads novos', leadsNovos, 'text-blue-600')}
 
               {card(
                 'Ticket médio (R$)',
