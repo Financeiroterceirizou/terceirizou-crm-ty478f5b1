@@ -111,6 +111,17 @@ const LeadDetalhe = () => {
     }
   }
 
+  const atualizarCampo = async (campo: string, valor: any) => {
+    try {
+      await pb.collection('leads').update(id!, { [campo]: valor })
+      setLead((prev: any) => ({ ...prev, [campo]: valor }))
+    } catch (e: any) {
+      setErro(e.message || 'Erro ao atualizar lead')
+    }
+  }
+
+  const SISTEMAS = ['Controlle', 'Financeiro Web', 'Granatum']
+
   const registrarInteracao = async (ev: React.FormEvent) => {
     ev.preventDefault()
     try {
@@ -241,20 +252,52 @@ const LeadDetalhe = () => {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6 text-sm">
             <div className="bg-slate-50 rounded-lg p-3">
-              <p className="text-xs text-slate-500">Faturamento mensal</p>
-              <p className="font-medium text-slate-800">
-                {lead.faturamento_mensal
-                  ? 'R$ ' + Number(lead.faturamento_mensal).toLocaleString('pt-BR')
-                  : '—'}
-              </p>
+              <label className="text-xs text-slate-500 block mb-1">Faturamento mensal (R$)</label>
+              <div className="flex items-center gap-1">
+                <span className="text-slate-500">R$</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  defaultValue={lead.faturamento_mensal ?? ''}
+                  onBlur={(ev) => {
+                    const v = ev.target.value === '' ? null : Number(ev.target.value)
+                    if (v !== lead.faturamento_mensal) atualizarCampo('faturamento_mensal', v)
+                  }}
+                  className="w-full rounded-md border border-slate-300 px-2 py-1 text-sm font-medium text-slate-800"
+                  placeholder="0,00"
+                />
+              </div>
             </div>
             <div className="bg-slate-50 rounded-lg p-3">
-              <p className="text-xs text-slate-500">Transações/mês</p>
-              <p className="font-medium text-slate-800">{lead.volume_transacoes || '—'}</p>
+              <label className="text-xs text-slate-500 block mb-1">Média de transações/mês</label>
+              <input
+                type="number"
+                step="1"
+                min="0"
+                defaultValue={lead.volume_transacoes ?? ''}
+                onBlur={(ev) => {
+                  const v = ev.target.value === '' ? null : Number(ev.target.value)
+                  if (v !== lead.volume_transacoes) atualizarCampo('volume_transacoes', v)
+                }}
+                className="w-full rounded-md border border-slate-300 px-2 py-1 text-sm font-medium text-slate-800"
+                placeholder="0"
+              />
             </div>
             <div className="bg-slate-50 rounded-lg p-3">
-              <p className="text-xs text-slate-500">Sistema atual</p>
-              <p className="font-medium text-slate-800">{lead.sistema_atual || '—'}</p>
+              <label className="text-xs text-slate-500 block mb-1">Sistema atual</label>
+              <select
+                value={SISTEMAS.includes(lead.sistema_atual) ? lead.sistema_atual : ''}
+                onChange={(ev) => atualizarCampo('sistema_atual', ev.target.value || null)}
+                className="w-full rounded-md border border-slate-300 px-2 py-1 text-sm font-medium text-slate-800 bg-white"
+              >
+                <option value="">Selecione…</option>
+                {SISTEMAS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="bg-slate-50 rounded-lg p-3">
               <p className="text-xs text-slate-500">Urgência</p>
