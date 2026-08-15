@@ -33,6 +33,19 @@ const Clientes = () => {
   }, [])
 
   const leadPorId = (id: string) => leads.find((l) => l.id === id)
+
+  const atualizarDataInicio = async (clienteId: string, valor: string) => {
+    try {
+      // valor vem como YYYY-MM-DD; envia como ISO no início do dia
+      const dataISO = valor ? new Date(valor + 'T00:00:00').toISOString() : ''
+      await pb.collection('clientes').update(clienteId, { data_inicio: dataISO })
+      setClientes((prev) =>
+        prev.map((c) => (c.id === clienteId ? { ...c, data_inicio: dataISO } : c)),
+      )
+    } catch (e: any) {
+      setErro(e.message || 'Erro ao atualizar data de início')
+    }
+  }
   const clientesOrdenados = [...clientes].sort((a, b) => {
     const nomeA = (leadPorId(a.lead)?.nome || '').toLowerCase()
     const nomeB = (leadPorId(b.lead)?.nome || '').toLowerCase()
@@ -126,8 +139,15 @@ const Clientes = () => {
                           {STATUS_LABEL[c.status_contrato] || c.status_contrato}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-slate-500">
-                        {c.data_inicio ? new Date(c.data_inicio).toLocaleDateString('pt-BR') : '—'}
+                      <td className="py-3 px-4">
+                        <input
+                          type="date"
+                          value={
+                            c.data_inicio ? new Date(c.data_inicio).toISOString().slice(0, 10) : ''
+                          }
+                          onChange={(ev) => atualizarDataInicio(c.id, ev.target.value)}
+                          className="text-sm rounded-md border border-slate-300 px-2 py-1 text-slate-700 bg-white"
+                        />
                       </td>
                     </tr>
                   )
