@@ -1,6 +1,6 @@
-// Proposta aceita (no CREATE ou no UPDATE) -> cria o cliente, o checklist de implantação
-// e a primeira mensalidade. Também atualiza o lead para a etapa "cliente".
-onRecordAfterCreateSuccess((e) => {
+// Proposta marcada como aceita via UPDATE (fluxo normal: enviada -> aceita).
+// Cria o cliente, o checklist de implantação e a primeira mensalidade.
+onRecordAfterUpdateSuccess((e) => {
   const proposta = e.record
   if (proposta.getString('status') !== 'aceita') return e.next()
 
@@ -15,7 +15,6 @@ onRecordAfterCreateSuccess((e) => {
     return e.next()
   }
 
-  // Cliente já criado para este lead? Não duplica.
   try {
     $app.findFirstRecordByFilter('clientes', 'lead = {:id}', leadId)
     return e.next()
@@ -25,7 +24,6 @@ onRecordAfterCreateSuccess((e) => {
   const valor = proposta.getFloat('valor_mensal') || 0
   const nowIso = new Date().toISOString()
 
-  // 1. Cliente
   let cliente = null
   try {
     const colClientes = $app.findCollectionByNameOrId('clientes')
@@ -42,7 +40,6 @@ onRecordAfterCreateSuccess((e) => {
     return e.next()
   }
 
-  // 2. Checklist de implantação
   const etapasImplantacao = [
     'coleta_dados',
     'definicao_plano',
@@ -63,7 +60,6 @@ onRecordAfterCreateSuccess((e) => {
     }
   }
 
-  // 3. Primeira mensalidade (competência do mês corrente)
   try {
     const colMens = $app.findCollectionByNameOrId('mensalidades')
     const mens = new Record(colMens)
@@ -80,7 +76,6 @@ onRecordAfterCreateSuccess((e) => {
     $app.logger().error('proposta aceita: falha ao criar mensalidade', 'error', String(err))
   }
 
-  // 4. Lead vira cliente
   lead.set('etapa', 'cliente')
   try {
     $app.save(lead)
