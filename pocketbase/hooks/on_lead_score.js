@@ -19,8 +19,7 @@ onRecordCreate((e) => {
   // Lead score automático (0-100)
   let score = 0
   if (tipo === 'prestador_servico') score += 40
-  const nicho = r.getString('nicho')
-  if (nicho && nicho !== 'outro') score += 15
+  if (r.getString('tipo_servico')) score += 15
   if (r.getBool('receita_recente')) score += 15
   const urg = r.getString('urgencia')
   const vol = r.getInt('volume_transacoes')

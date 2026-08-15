@@ -30,21 +30,10 @@ const CANAL_LABEL: Record<string, string> = {
   ligacao: 'Ligação',
 }
 
-const NICHO_LABEL: Record<string, string> = {
-  ilpi: 'Casa de Repouso (ILPI)',
-  protecao_veicular: 'Proteção Veicular',
-  vistoria_veicular: 'Vistoria Veicular',
-  arquitetura: 'Arquitetura',
-  marketing: 'Marketing',
-  consultoria_ambiental: 'Consultoria Ambiental',
-  consultoria_negocio: 'Consultoria de Negócio',
-  clinica_estetica: 'Clínica de Estética',
-  outro: 'Outro',
-}
-
 const LeadDetalhe = () => {
   const { id } = useParams()
   const [lead, setLead] = useState<any>(null)
+  const [tipos, setTipos] = useState<any[]>([])
   const [interacoes, setInteracoes] = useState<any[]>([])
   const [reunioes, setReunioes] = useState<any[]>([])
   const [propostas, setPropostas] = useState<any[]>([])
@@ -58,18 +47,20 @@ const LeadDetalhe = () => {
   useEffect(() => {
     const carregar = async () => {
       try {
-        const [l, i, r, p] = await Promise.all([
+        const [l, i, r, p, t] = await Promise.all([
           pb.collection('leads').getOne(id!),
           pb
             .collection('interacoes')
             .getList(1, 100, { filter: `lead="${id}"`, sort: '-data_hora' }),
           pb.collection('reunioes').getList(1, 50, { filter: `lead="${id}"`, sort: '-data_hora' }),
           pb.collection('propostas').getList(1, 50, { filter: `lead="${id}"`, sort: '-created' }),
+          pb.collection('tipos_servico').getList(1, 100, { sort: 'nome' }),
         ])
         setLead(l)
         setInteracoes(i.items)
         setReunioes(r.items)
         setPropostas(p.items)
+        setTipos(t.items)
       } catch (e: any) {
         setErro(e.message || 'Erro ao carregar lead')
       }
@@ -83,6 +74,15 @@ const LeadDetalhe = () => {
       setLead((prev: any) => ({ ...prev, etapa }))
     } catch (e: any) {
       setErro(e.message || 'Erro ao mover etapa')
+    }
+  }
+
+  const mudarTipo = async (tipoId: string) => {
+    try {
+      await pb.collection('leads').update(id!, { tipo_servico: tipoId || null })
+      setLead((prev: any) => ({ ...prev, tipo_servico: tipoId }))
+    } catch (e: any) {
+      setErro(e.message || 'Erro ao atualizar tipo de serviço')
     }
   }
 
@@ -108,6 +108,8 @@ const LeadDetalhe = () => {
 
   if (erro && !lead) return <div className="p-8 text-red-600">{erro}</div>
   if (!lead) return <div className="p-8 text-slate-500">Carregando…</div>
+
+  const tipoAtual = tipos.find((t) => t.id === lead.tipo_servico)
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -142,7 +144,7 @@ const LeadDetalhe = () => {
               <p className="text-slate-600">{lead.empresa}</p>
               <p className="text-sm text-slate-500 mt-1">
                 {CANAL_LABEL[lead.canal_origem] || lead.canal_origem}
-                {lead.nicho ? ` · ${NICHO_LABEL[lead.nicho] || lead.nicho}` : ''}
+                {tipoAtual ? ` · ${tipoAtual.nome}` : ''}
                 {lead.cidade ? ` · ${lead.cidade}${lead.uf ? '/' + lead.uf : ''}` : ''}
               </p>
             </div>
@@ -172,6 +174,21 @@ const LeadDetalhe = () => {
                 </option>
               ))}
             </select>
+
+            <span className="text-sm text-slate-500 ml-3">Tipo de serviço:</span>
+            <select
+              value={lead.tipo_servico || ''}
+              onChange={(ev) => mudarTipo(ev.target.value)}
+              className="text-sm rounded-lg border border-slate-300 px-2 py-1"
+            >
+              <option value="">Selecione…</option>
+              {tipos.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.nome}
+                </option>
+              ))}
+            </select>
+
             {lead.motivo_descarte && (
               <span className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
                 {lead.motivo_descarte}

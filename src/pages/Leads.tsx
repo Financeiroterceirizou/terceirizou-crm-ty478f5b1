@@ -1,4 +1,5 @@
-/* Página de Leads: kanban por etapa, filtro por canal e criação manual de lead. */
+/* Página de Leads: kanban por etapa, filtro por canal e criação manual de lead.
+   Tipo de serviço é dinâmico (coleção tipos_servico) com botão para incluir novos. */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import pb from '@/lib/pocketbase/client'
@@ -39,18 +40,6 @@ const CANAL_LABEL: Record<string, string> = {
   indicacao: 'Indicação',
 }
 
-const NICHO_LABEL: Record<string, string> = {
-  ilpi: 'Casa de Repouso (ILPI)',
-  protecao_veicular: 'Proteção Veicular',
-  vistoria_veicular: 'Vistoria Veicular',
-  arquitetura: 'Arquitetura',
-  marketing: 'Marketing',
-  consultoria_ambiental: 'Consultoria Ambiental',
-  consultoria_negocio: 'Consultoria de Negócio',
-  clinica_estetica: 'Clínica de Estética',
-  outro: 'Outro',
-}
-
 const DOR_LABEL: Record<string, string> = {
   falta_tempo: 'Falta de tempo',
   falta_transparencia: 'Falta de transparência',
@@ -81,7 +70,7 @@ const FORM_INICIAL = {
   uf: '',
   canal_origem: 'whatsapp',
   tipo_negocio: 'prestador_servico',
-  nicho: 'outro',
+  tipo_servico: '',
   urgencia: 'media',
   sistema_atual: '',
   indicado_por: '',
@@ -91,18 +80,25 @@ const FORM_INICIAL = {
 
 const Leads = () => {
   const [leads, setLeads] = useState<any[]>([])
+  const [tipos, setTipos] = useState<any[]>([])
   const [filtroCanal, setFiltroCanal] = useState('')
   const [erro, setErro] = useState('')
   const [mostrarForm, setMostrarForm] = useState(false)
   const [form, setForm] = useState({ ...FORM_INICIAL })
   const [salvando, setSalvando] = useState(false)
+  const [novoTipo, setNovoTipo] = useState('')
+  const [salvandoTipo, setSalvandoTipo] = useState(false)
 
   const carregar = async () => {
     try {
-      const lista = await pb.collection('leads').getList(1, 300, { sort: '-created' })
+      const [lista, tiposLista] = await Promise.all([
+        pb.collection('leads').getList(1, 300, { sort: '-created' }),
+        pb.collection('tipos_servico').getList(1, 100, { sort: 'nome' }),
+      ])
       setLeads(lista.items)
+      setTipos(tiposLista.items)
     } catch (e: any) {
-      setErro(e.message || 'Erro ao carregar leads')
+      setErro(e.message || 'Erro ao carregar dados')
     }
   }
 
@@ -126,6 +122,23 @@ const Leads = () => {
     }))
   }
 
+  const criarTipo = async (ev: React.FormEvent) => {
+    ev.preventDefault()
+    const nome = novoTipo.trim()
+    if (!nome) return
+    setSalvandoTipo(true)
+    setErro('')
+    try {
+      const criado = await pb.collection('tipos_servico').create({ nome, ativo: true })
+      setTipos((prev) => [...prev, criado].sort((a, b) => a.nome.localeCompare(b.nome)))
+      setForm((prev) => ({ ...prev, tipo_servico: criado.id }))
+      setNovoTipo('')
+    } catch (e: any) {
+      setErro(e.message || 'Erro ao criar tipo de serviço')
+    }
+    setSalvandoTipo(false)
+  }
+
   const criarLead = async (ev: React.FormEvent) => {
     ev.preventDefault()
     setSalvando(true)
@@ -137,10 +150,10 @@ const Leads = () => {
         telefone: form.telefone.trim(),
         canal_origem: form.canal_origem,
         tipo_negocio: form.tipo_negocio,
-        nicho: form.nicho,
         urgencia: form.urgencia,
         dores: form.dores,
       }
+      if (form.tipo_servico) payload.tipo_servico = form.tipo_servico
       if (form.email.trim()) payload.email = form.email.trim()
       if (form.cidade.trim()) payload.cidade = form.cidade.trim()
       if (form.uf.trim()) payload.uf = form.uf.trim().toUpperCase()
@@ -151,7 +164,6 @@ const Leads = () => {
 
       const novo = await pb.collection('leads').create(payload)
 
-      // Observação vira a primeira interação do lead
       if (form.observacao.trim()) {
         await pb.collection('interacoes').create({
           lead: novo.id,
@@ -172,6 +184,7 @@ const Leads = () => {
   }
 
   const filtrados = filtroCanal ? leads.filter((l) => l.canal_origem === filtroCanal) : leads
+  const tipoPorId = (id: string) => tipos.find((t) => t.id === id)
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -247,6 +260,9 @@ const Leads = () => {
                       <div className="flex items-center justify-between mt-2">
                         <span className="text-xs text-slate-500">
                           {CANAL_LABEL[l.canal_origem] || l.canal_origem}
+                          {l.tipo_servico && tipoPorId(l.tipo_servico)
+                            ? ` · ${tipoPorId(l.tipo_servico).nome}`
+                            : ''}
                         </span>
                         <span
                           className={`text-xs font-medium px-1.5 py-0.5 rounded ${(l.score || 0) >= 60 ? 'bg-emerald-100 text-emerald-700' : (l.score || 0) >= 35 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}
@@ -373,19 +389,54 @@ const Leads = () => {
                     </p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Nicho</label>
-                  <select
-                    value={form.nicho}
-                    onChange={(ev) => setForm({ ...form, nicho: ev.target.value })}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                  >
-                    {Object.entries(NICHO_LABEL).map(([k, v]) => (
-                      <option key={k} value={k}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Tipo de serviço
+                  </label>
+                  <div className="flex gap-2">
+                    <select
+                      value={form.tipo_servico}
+                      onChange={(ev) => setForm({ ...form, tipo_servico: ev.target.value })}
+                      className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    >
+                      <option value="">Selecione…</option>
+                      {tipos.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.nome}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => setNovoTipo('')}
+                      className="rounded-lg border border-emerald-300 text-emerald-700 px-3 py-2 text-sm whitespace-nowrap hover:bg-emerald-50"
+                      title="Incluir novo tipo de serviço"
+                    >
+                      + Novo tipo
+                    </button>
+                  </div>
+                  {novoTipo !== '' && (
+                    <form
+                      onSubmit={criarTipo}
+                      className="mt-2 flex gap-2 items-center"
+                      onClick={(ev) => ev.stopPropagation()}
+                    >
+                      <input
+                        value={novoTipo}
+                        onChange={(ev) => setNovoTipo(ev.target.value)}
+                        className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+                        placeholder="Nome do novo tipo de serviço"
+                        autoFocus
+                      />
+                      <button
+                        type="submit"
+                        disabled={salvandoTipo}
+                        className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 text-sm disabled:opacity-50"
+                      >
+                        Salvar
+                      </button>
+                    </form>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Urgência</label>
