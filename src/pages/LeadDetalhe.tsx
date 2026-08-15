@@ -49,7 +49,6 @@ const LeadDetalhe = () => {
   const [interacoes, setInteracoes] = useState<any[]>([])
   const [reunioes, setReunioes] = useState<any[]>([])
   const [propostas, setPropostas] = useState<any[]>([])
-  const [cliente, setCliente] = useState<any>(null)
   const [erro, setErro] = useState('')
   const [novaInteracao, setNovaInteracao] = useState({
     resumo: '',
@@ -60,7 +59,7 @@ const LeadDetalhe = () => {
   useEffect(() => {
     const carregar = async () => {
       try {
-        const [l, i, r, p, t, cl] = await Promise.all([
+        const [l, i, r, p, t] = await Promise.all([
           pb.collection('leads').getOne(id!),
           pb
             .collection('interacoes')
@@ -68,14 +67,12 @@ const LeadDetalhe = () => {
           pb.collection('reunioes').getList(1, 50, { filter: `lead="${id}"`, sort: '-data_hora' }),
           pb.collection('propostas').getList(1, 50, { filter: `lead="${id}"`, sort: '-created' }),
           pb.collection('tipos_servico').getList(1, 100, { sort: 'nome' }),
-          pb.collection('clientes').getList(1, 1, { filter: `lead="${id}"` }),
         ])
         setLead(l)
         setInteracoes(i.items)
         setReunioes(r.items)
         setPropostas(p.items)
         setTipos(t.items)
-        setCliente(cl.items[0] || null)
       } catch (e: any) {
         setErro(e.message || 'Erro ao carregar lead')
       }
@@ -118,8 +115,6 @@ const LeadDetalhe = () => {
       setErro(e.message || 'Erro ao atualizar lead')
     }
   }
-
-  const SISTEMAS = ['Controlle', 'Financeiro Web', 'Granatum']
 
   const registrarInteracao = async (ev: React.FormEvent) => {
     ev.preventDefault()
@@ -282,46 +277,6 @@ const LeadDetalhe = () => {
                 className="w-full rounded-md border border-slate-300 px-2 py-1 text-sm font-medium text-slate-800"
                 placeholder="0"
               />
-            </div>
-            <div className="bg-slate-50 rounded-lg p-3">
-              <label className="text-xs text-slate-500 block mb-1">Sistema atual</label>
-              <select
-                value={SISTEMAS.includes(lead.sistema_atual) ? lead.sistema_atual : ''}
-                onChange={(ev) => atualizarCampo('sistema_atual', ev.target.value || null)}
-                className="w-full rounded-md border border-slate-300 px-2 py-1 text-sm font-medium text-slate-800 bg-white"
-              >
-                <option value="">Selecione…</option>
-                {SISTEMAS.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="bg-slate-50 rounded-lg p-3">
-              <p className="text-xs text-slate-500">Valor do plano (R$/mês)</p>
-              <p className="font-medium text-slate-800">
-                {cliente?.valor_plano != null
-                  ? 'R$ ' + Number(cliente.valor_plano).toLocaleString('pt-BR')
-                  : '—'}
-              </p>
-            </div>
-            <div className="bg-slate-50 rounded-lg p-3">
-              <p className="text-xs text-slate-500">Licença de Software Parceiro (R$/mês)</p>
-              <p className="font-medium text-slate-800">
-                {cliente?.valor_licenca != null
-                  ? 'R$ ' + Number(cliente.valor_licenca).toLocaleString('pt-BR')
-                  : '—'}
-              </p>
-            </div>
-            <div className="bg-slate-50 rounded-lg p-3">
-              <p className="text-xs text-slate-500">Total mensal (R$/mês)</p>
-              <p className="font-medium text-emerald-700">
-                {cliente?.valor_mensal != null
-                  ? 'R$ ' + Number(cliente.valor_mensal).toLocaleString('pt-BR')
-                  : '—'}
-              </p>
             </div>
           </div>
         </div>
