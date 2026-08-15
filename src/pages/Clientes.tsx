@@ -94,7 +94,6 @@ const Clientes = () => {
                   <th className="py-3 px-4">Plano</th>
                   <th className="py-3 px-4">Valor (R$)</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Saúde</th>
                   <th className="py-3 px-4">Início</th>
                 </tr>
               </thead>
@@ -127,13 +126,6 @@ const Clientes = () => {
                           {STATUS_LABEL[c.status_contrato] || c.status_contrato}
                         </span>
                       </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${(c.score_saude || 0) >= 70 ? 'bg-emerald-100 text-emerald-700' : (c.score_saude || 0) >= 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}
-                        >
-                          {c.score_saude ?? 0}
-                        </span>
-                      </td>
                       <td className="py-3 px-4 text-slate-500">
                         {c.data_inicio ? new Date(c.data_inicio).toLocaleDateString('pt-BR') : '—'}
                       </td>
@@ -142,7 +134,7 @@ const Clientes = () => {
                 })}
                 {clientes.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-6 text-center text-slate-400">
+                    <td colSpan={5} className="py-6 text-center text-slate-400">
                       Nenhum cliente ainda. Aceite uma proposta para abrir a operação.
                     </td>
                   </tr>
