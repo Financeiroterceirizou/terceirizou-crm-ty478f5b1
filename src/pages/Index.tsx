@@ -17,8 +17,7 @@ const ETAPA_LABEL: Record<string, string> = {
 }
 
 const CANAL_LABEL: Record<string, string> = {
-  instagram: 'Instagram',
-  facebook: 'Facebook',
+  meta: 'Meta',
   linkedin: 'LinkedIn',
   email: 'E-mail',
   whatsapp: 'WhatsApp',

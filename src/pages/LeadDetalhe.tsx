@@ -19,8 +19,7 @@ const ETAPA_LABEL: Record<string, string> = {
 const ETAPAS = Object.keys(ETAPA_LABEL)
 
 const CANAL_LABEL: Record<string, string> = {
-  instagram: 'Instagram',
-  facebook: 'Facebook',
+  meta: 'Meta',
   linkedin: 'LinkedIn',
   email: 'E-mail',
   whatsapp: 'WhatsApp',
@@ -33,8 +32,7 @@ const CANAL_LABEL: Record<string, string> = {
 
 // Canais válidos para o campo canal_origem do lead (schema da coleção leads)
 const CANAL_LEAD_LABEL: Record<string, string> = {
-  instagram: 'Instagram',
-  facebook: 'Facebook',
+  meta: 'Meta',
   linkedin: 'LinkedIn',
   email: 'E-mail',
   whatsapp: 'WhatsApp',
