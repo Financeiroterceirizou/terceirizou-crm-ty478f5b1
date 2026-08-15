@@ -1,3 +1,4 @@
+// CRM Terceirizou — Etapa 1: coleção de Leads (funil comercial). Re-upload pós-correção.
 migrate(
   (app) => {
     const usersId = '_pb_users_auth_'

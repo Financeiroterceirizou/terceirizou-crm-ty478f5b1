@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T14:28:11.126Z",
+  "generatedAt": "2026-08-15T14:30:35.257Z",
   "collections": [
     {
       "name": "users",
@@ -41,6 +41,17 @@
           "autodateTriggers": [
             "onCreate",
             "onUpdate"
+          ]
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "admin",
+            "vendedor",
+            "operadora"
           ]
         }
       ],
@@ -210,6 +221,952 @@
         }
       ],
       "indexes": []
+    },
+    {
+      "name": "leads",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'vendedor')",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'vendedor')",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'admin' || @request.auth.role = 'vendedor')",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "empresa",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "cnpj",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "telefone",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cidade",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "uf",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "unidade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "floripa",
+            "tubarao"
+          ]
+        },
+        {
+          "name": "canal_origem",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "instagram",
+            "facebook",
+            "linkedin",
+            "email",
+            "whatsapp",
+            "telegram",
+            "indicacao"
+          ]
+        },
+        {
+          "name": "indicado_por",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tipo_negocio",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "prestador_servico",
+            "comercio",
+            "industria",
+            "outro"
+          ]
+        },
+        {
+          "name": "nicho",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "ilpi",
+            "protecao_veicular",
+            "vistoria_veicular",
+            "arquitetura",
+            "marketing",
+            "consultoria_ambiental",
+            "consultoria_negocio",
+            "clinica_estetica",
+            "outro"
+          ]
+        },
+        {
+          "name": "faturamento_mensal",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "num_funcionarios",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "num_contas",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "volume_transacoes",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sistema_atual",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "receita_recente",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "decisor",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "urgencia",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "baixa",
+            "media",
+            "alta"
+          ]
+        },
+        {
+          "name": "dores",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "falta_tempo",
+            "falta_transparencia",
+            "dificuldade_decisao",
+            "contas_misturadas",
+            "custos_fora_controle"
+          ]
+        },
+        {
+          "name": "ticket_estimado",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "responsavel",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "etapa",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "novo",
+            "qualificado",
+            "primeiro_contato",
+            "reuniao_agendada",
+            "reuniao_realizada",
+            "proposta_enviada",
+            "negociacao",
+            "cliente",
+            "perdido",
+            "descartado"
+          ]
+        },
+        {
+          "name": "score",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "prioridade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "baixa",
+            "media",
+            "alta"
+          ]
+        },
+        {
+          "name": "motivo_perda",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "motivo_descarte",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "campanha",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "campanhas"
+        },
+        {
+          "name": "consentimento_lgpd",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_consentimento",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "canal_consentimento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "solicitou_exclusao",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_leads_etapa ON leads (etapa)",
+        "CREATE INDEX idx_leads_canal ON leads (canal_origem)",
+        "CREATE INDEX idx_leads_telefone ON leads (telefone)",
+        "CREATE INDEX idx_leads_cnpj ON leads (cnpj)",
+        "CREATE INDEX idx_leads_email ON leads (email)",
+        "CREATE INDEX idx_leads_responsavel_created ON leads (responsavel, created)"
+      ]
+    },
+    {
+      "name": "interacoes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "lead",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "leads"
+        },
+        {
+          "name": "canal",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "instagram",
+            "facebook",
+            "linkedin",
+            "email",
+            "whatsapp",
+            "telegram",
+            "indicacao",
+            "reuniao",
+            "ligacao"
+          ]
+        },
+        {
+          "name": "tipo",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "entrada",
+            "saida"
+          ]
+        },
+        {
+          "name": "data_hora",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "responsavel",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "resumo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "proximo_passo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_proximo_passo",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resultado",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_interacoes_lead_data ON interacoes (lead, data_hora)"
+      ]
+    },
+    {
+      "name": "reunioes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "lead",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "leads"
+        },
+        {
+          "name": "responsavel",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "data_hora",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "formato",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "presencial",
+            "video",
+            "telefone"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "agendada",
+            "realizada",
+            "cancelada",
+            "nao_compareceu"
+          ]
+        },
+        {
+          "name": "resultado",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "avancou",
+            "pediu_proposta",
+            "sem_interesse",
+            "recompra"
+          ]
+        },
+        {
+          "name": "proximo_passo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_reunioes_data ON reunioes (data_hora)",
+        "CREATE INDEX idx_reunioes_status ON reunioes (status)"
+      ]
+    },
+    {
+      "name": "propostas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "lead",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "leads"
+        },
+        {
+          "name": "plano",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "planos"
+        },
+        {
+          "name": "valor_mensal",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "condicoes_pagamento",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_envio",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "enviada",
+            "vista",
+            "aceita",
+            "recusada",
+            "vencida"
+          ]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_propostas_lead ON propostas (lead)"
+      ]
+    },
+    {
+      "name": "clientes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "lead",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "leads"
+        },
+        {
+          "name": "plano",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "planos"
+        },
+        {
+          "name": "valor_mensal",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "data_inicio",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "status_contrato",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "ativo",
+            "inadimplente",
+            "cancelado"
+          ]
+        },
+        {
+          "name": "operadora",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "formato_envio",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "whatsapp",
+            "email",
+            "integracao_automatica"
+          ]
+        },
+        {
+          "name": "unidade",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "floripa",
+            "tubarao"
+          ]
+        },
+        {
+          "name": "ultimo_contato",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "score_saude",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_clientes_status ON clientes (status_contrato)",
+        "CREATE INDEX idx_clientes_operadora ON clientes (operadora)"
+      ]
+    },
+    {
+      "name": "mensalidades",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "cliente",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "competencia",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "valor",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "vencimento",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "paga",
+            "em_aberto",
+            "atrasada"
+          ]
+        },
+        {
+          "name": "data_pagamento",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_mensalidades_cliente_comp ON mensalidades (cliente, competencia)",
+        "CREATE INDEX idx_mensalidades_status_venc ON mensalidades (status, vencimento)"
+      ]
+    },
+    {
+      "name": "implantacao",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "cliente",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "etapa",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "coleta_dados",
+            "definicao_plano",
+            "integracao_sistema",
+            "cadastro_contas",
+            "treinamento_cliente"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "pendente",
+            "em_andamento",
+            "concluida"
+          ]
+        },
+        {
+          "name": "responsavel",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "prazo",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_conclusao",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_implantacao_cliente ON implantacao (cliente)"
+      ]
+    },
+    {
+      "name": "tarefas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "tipo",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "follow_up",
+            "envio_proposta",
+            "ligacao",
+            "implantacao",
+            "cobranca",
+            "renovacao"
+          ]
+        },
+        {
+          "name": "lead",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "leads"
+        },
+        {
+          "name": "cliente",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "clientes"
+        },
+        {
+          "name": "responsavel",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "prazo",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "pendente",
+            "concluida",
+            "cancelada"
+          ]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_tarefas_prazo ON tarefas (prazo)",
+        "CREATE INDEX idx_tarefas_status ON tarefas (status)"
+      ]
     }
   ]
 }

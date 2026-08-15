@@ -1,3 +1,4 @@
+// CRM Terceirizou — Etapa 1: campo de papel (role) nos usuários. Re-upload pós-correção.
 migrate(
   (app) => {
     const col = app.findCollectionByNameOrId('_pb_users_auth_')

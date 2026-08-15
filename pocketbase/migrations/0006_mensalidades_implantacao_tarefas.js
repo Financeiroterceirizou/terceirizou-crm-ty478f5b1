@@ -1,3 +1,4 @@
+// CRM Terceirizou — Etapa 1: Mensalidades, Implantação e Tarefas (recorrência e operação). Re-upload pós-correção.
 migrate(
   (app) => {
     const usersId = '_pb_users_auth_'

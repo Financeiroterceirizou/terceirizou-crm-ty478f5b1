@@ -1,3 +1,4 @@
+// CRM Terceirizou — Etapa 1: Interações, Reuniões e Propostas (histórico comercial). Re-upload pós-correção.
 migrate(
   (app) => {
     const usersId = '_pb_users_auth_'
