@@ -48,7 +48,7 @@ migrate(
       'Plano Personalizado',
       'recorrente',
       'Mais de 3 contas ou mais de 300 transações/mês (valor sob consulta)',
-      0,
+      null,
       'Atendimento sob medida para operações maiores. Valor sob consulta.',
     )
 

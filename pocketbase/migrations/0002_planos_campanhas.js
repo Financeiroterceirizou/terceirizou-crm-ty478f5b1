@@ -20,7 +20,7 @@ migrate(
         { name: 'faixa_volume', type: 'text' },
         { name: 'min_transacoes', type: 'number' },
         { name: 'max_transacoes', type: 'number' },
-        { name: 'valor_mensal', type: 'number', required: true },
+        { name: 'valor_mensal', type: 'number' },
         { name: 'servicos_inclusos', type: 'text' },
         { name: 'ativo', type: 'bool' },
         { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
