@@ -5,27 +5,21 @@ migrate(
     const col = app.findCollectionByNameOrId('clientes')
 
     // 1. campo valor_plano
-    let fPlano = col.fields.getByName('valor_plano')
-    if (!fPlano) {
-      fPlano = new app.schema.Field({ type: 'number', name: 'valor_plano', required: false })
-      col.fields.add(fPlano)
+    if (!col.fields.getByName('valor_plano')) {
+      col.fields.add(new NumberField({ name: 'valor_plano', required: false }))
     }
 
     // 2. campo valor_licenca
-    let fLic = col.fields.getByName('valor_licenca')
-    if (!fLic) {
-      fLic = new app.schema.Field({ type: 'number', name: 'valor_licenca', required: false })
-      col.fields.add(fLic)
+    if (!col.fields.getByName('valor_licenca')) {
+      col.fields.add(new NumberField({ name: 'valor_licenca', required: false }))
     }
 
     app.save(col)
   },
   (app) => {
     const col = app.findCollectionByNameOrId('clientes')
-    const fPlano = col.fields.getByName('valor_plano')
-    if (fPlano) col.fields.remove(fPlano)
-    const fLic = col.fields.getByName('valor_licenca')
-    if (fLic) col.fields.remove(fLic)
+    col.fields.removeByName('valor_plano')
+    col.fields.removeByName('valor_licenca')
     app.save(col)
   },
 )
