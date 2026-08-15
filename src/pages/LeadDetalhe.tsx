@@ -31,6 +31,18 @@ const CANAL_LABEL: Record<string, string> = {
   ligacao: 'Ligação',
 }
 
+// Canais válidos para o campo canal_origem do lead (schema da coleção leads)
+const CANAL_LEAD_LABEL: Record<string, string> = {
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  linkedin: 'LinkedIn',
+  email: 'E-mail',
+  whatsapp: 'WhatsApp',
+  telegram: 'Telegram',
+  indicacao: 'Indicação',
+  banco_cora: 'Banco Cora',
+}
+
 const LeadDetalhe = () => {
   const { id } = useParams()
   const [lead, setLead] = useState<any>(null)
@@ -84,6 +96,15 @@ const LeadDetalhe = () => {
       setLead((prev: any) => ({ ...prev, tipo_servico: tipoId }))
     } catch (e: any) {
       setErro(e.message || 'Erro ao atualizar tipo de serviço')
+    }
+  }
+
+  const mudarCanal = async (canal: string) => {
+    try {
+      await pb.collection('leads').update(id!, { canal_origem: canal })
+      setLead((prev: any) => ({ ...prev, canal_origem: canal }))
+    } catch (e: any) {
+      setErro(e.message || 'Erro ao atualizar canal de origem')
     }
   }
 
@@ -186,6 +207,19 @@ const LeadDetalhe = () => {
               {tipos.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.nome}
+                </option>
+              ))}
+            </select>
+
+            <span className="text-sm text-slate-500 ml-3">Canal:</span>
+            <select
+              value={lead.canal_origem || ''}
+              onChange={(ev) => mudarCanal(ev.target.value)}
+              className="text-sm rounded-lg border border-slate-300 px-2 py-1"
+            >
+              {Object.entries(CANAL_LEAD_LABEL).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
                 </option>
               ))}
             </select>
