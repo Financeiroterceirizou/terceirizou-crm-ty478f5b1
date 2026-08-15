@@ -97,9 +97,18 @@ const Clientes = () => {
                 {clientes.map((c) => {
                   const lead = leadPorId(c.lead)
                   return (
-                    <tr key={c.id} className="border-b border-slate-100">
-                      <td className="py-3 px-4 font-medium text-slate-800">
-                        {lead?.nome || '—'}
+                    <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="py-3 px-4">
+                        {lead ? (
+                          <Link
+                            to={`/leads/${lead.id}`}
+                            className="font-medium text-slate-800 hover:text-emerald-700 hover:underline"
+                          >
+                            {lead.nome || '—'}
+                          </Link>
+                        ) : (
+                          <span className="font-medium text-slate-800">—</span>
+                        )}
                         <span className="block text-xs text-slate-500">{lead?.empresa || ''}</span>
                       </td>
                       <td className="py-3 px-4 text-slate-600">{c.plano ? 'Plano' : '—'}</td>
