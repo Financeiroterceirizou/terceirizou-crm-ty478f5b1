@@ -11,7 +11,6 @@ const ETAPA_LABEL: Record<string, string> = {
   reuniao_realizada: 'Reunião realizada',
   proposta_enviada: 'Proposta enviada',
   negociacao: 'Negociação',
-  cliente: 'Cliente',
   perdido: 'Perdido',
   descartado: 'Descartado',
 }
@@ -122,7 +121,7 @@ const Index = () => {
     )
   }
 
-  const ativos = leads.filter((l) => !['perdido', 'descartado'].includes(l.etapa))
+  const ativos = leads.filter((l) => !['cliente', 'perdido', 'descartado'].includes(l.etapa))
   const emReuniao = leads.filter((l) => l.etapa === 'reuniao_agendada').length
   const emProposta = leads.filter((l) =>
     ['proposta_enviada', 'negociacao'].includes(l.etapa),
