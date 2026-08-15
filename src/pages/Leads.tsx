@@ -84,6 +84,8 @@ const Leads = () => {
   const [tipos, setTipos] = useState<any[]>([])
   const [filtroCanal, setFiltroCanal] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
+  const [filtroClienteAtivo, setFiltroClienteAtivo] = useState('')
+  const [clientesAtivos, setClientesAtivos] = useState<Set<string>>(new Set())
   const [erro, setErro] = useState('')
   const [mostrarForm, setMostrarForm] = useState(false)
   const [form, setForm] = useState({ ...FORM_INICIAL })
@@ -95,12 +97,18 @@ const Leads = () => {
 
   const carregar = async () => {
     try {
-      const [lista, tiposLista] = await Promise.all([
+      const [lista, tiposLista, clientesLista] = await Promise.all([
         pb.collection('leads').getList(1, 300, { sort: '-created' }),
         pb.collection('tipos_servico').getList(1, 100, { sort: 'nome' }),
+        pb.collection('clientes').getList(1, 300, { fields: 'lead,status_contrato' }),
       ])
       setLeads(lista.items)
       setTipos(ordenaTipos(tiposLista.items))
+      setClientesAtivos(
+        new Set(
+          clientesLista.items.filter((c) => c.status_contrato === 'ativo').map((c) => c.lead),
+        ),
+      )
     } catch (e: any) {
       setErro(e.message || 'Erro ao carregar dados')
     }
@@ -190,7 +198,13 @@ const Leads = () => {
   const filtrados = leads.filter((l) => {
     const porCanal = filtroCanal ? l.canal_origem === filtroCanal : true
     const porTipo = filtroTipo ? l.tipo_servico === filtroTipo : true
-    return porCanal && porTipo
+    const porClienteAtivo =
+      filtroClienteAtivo === 'sim'
+        ? clientesAtivos.has(l.id)
+        : filtroClienteAtivo === 'nao'
+          ? !clientesAtivos.has(l.id)
+          : true
+    return porCanal && porTipo && porClienteAtivo
   })
   const tipoPorId = (id: string) => tipos.find((t) => t.id === id)
 
@@ -236,6 +250,15 @@ const Leads = () => {
                   {t.nome}
                 </option>
               ))}
+            </select>
+            <select
+              value={filtroClienteAtivo}
+              onChange={(ev) => setFiltroClienteAtivo(ev.target.value)}
+              className="text-sm rounded-lg border border-slate-300 px-2 py-1"
+            >
+              <option value="">Cliente ativo: Todos</option>
+              <option value="sim">Cliente ativo: Sim</option>
+              <option value="nao">Cliente ativo: Não</option>
             </select>
             <span className="text-sm text-slate-600">{filtrados.length} leads</span>
             <button
