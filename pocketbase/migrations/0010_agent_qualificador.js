@@ -33,14 +33,7 @@ migrate(
         {
           collection: 'leads',
           perms: { list: true, read: true, update: true },
-          actAs: 'user',
-          scopeFilter: 'responsavel = @request.auth.id || @request.auth.role = "admin"',
-        },
-        {
-          collection: 'leads',
-          perms: { list: true, read: true, update: true },
           actAs: 'admin',
-          scopeFilter: 'id = {:lead_id}',
         },
       ],
       memory: [
